@@ -7,16 +7,22 @@ import { useState } from "react";
 const Card = () => {
   const inputRef = useRef(null);
   const [list, setList] = useState([]);
+  const [isInit, setIsInit] = useState(false);
+
   useEffect(() => {
     inputRef.current.focus();
     const localList = localStorage.getItem("list");
     if (localList) {
       setList(JSON.parse(localList));
     }
+    setIsInit(true);
   }, []);
 
   useEffect(() => {
     console.log(list);
+    if (isInit) {
+      localStorage.setItem("list", JSON.stringify(list));
+    }
     inputRef.current.value = "";
   }, [list]);
 
@@ -24,15 +30,11 @@ const Card = () => {
     e.preventDefault();
     if (inputRef.current.value.trim() !== "") {
       setList((prevlist) => [...prevlist, inputRef.current.value]);
-      localStorage.setItem(
-        "list",
-        JSON.stringify([...list, inputRef.current.value])
-      );
     }
   };
 
   const handleRemoveList = (index) => {
-    setList(list.filter((l, i) => i !== index));
+    setList((l) => l.filter((_, i) => i !== index));
   };
 
   return (
